@@ -111,18 +111,16 @@
 
 .ship {
   position: absolute;
-  color: var(--accent);
+  stroke: url(#ship-gradient);
   transform: rotate(-45deg);
   filter: drop-shadow(0 0 8px var(--accent));
 }
 
 .obstacle {
   position: absolute;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent);
+  color: var(--danger);
+  fill: rgba(var(--danger-rgb), 0.3);
+  filter: drop-shadow(0 0 6px var(--danger));
 }
 
 .game-over {
@@ -131,11 +129,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: ui-monospace, monospace;
-  font-size: 48px;
-  color: var(--accent);
-  text-shadow: 0 0 20px var(--accent);
   background: rgba(0, 0, 0, 0.55);
+}
+
+.game-over-card {
+  font-family: ui-monospace, monospace;
+  text-align: center;
+  background: #121212;
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  padding: 48px 80px;
+  min-width: 320px;
+  box-shadow:
+    0 0 24px rgba(var(--accent-rgb), 0.25),
+    inset 0 0 20px rgba(var(--accent-rgb), 0.08);
+}
+
+.game-over-card h2 {
+  margin: 0 0 24px;
+  color: var(--accent);
+  text-shadow: 0 0 16px var(--accent);
+  font-size: 36px;
+}
+
+.game-over-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: var(--text);
+  font-size: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .start-button {

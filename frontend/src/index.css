@@ -3,6 +3,8 @@
   --bg-glow: #0a1420;
   --accent-rgb: 255, 136, 0;
   --accent: rgb(var(--accent-rgb));
+  --danger-rgb: 255, 60, 60;
+  --danger: rgb(var(--danger-rgb));
   --grid-line: rgba(var(--accent-rgb), 0.06);
   --text: #d6f9f7;
 
