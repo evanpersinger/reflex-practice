@@ -98,12 +98,24 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: transparent;
-  border: 2px solid var(--accent);
-  box-shadow:
-    0 0 12px var(--accent),
-    inset 0 0 12px var(--accent);
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--accent) 0%,
+    rgba(var(--accent-rgb), 0.6) 40%,
+    rgba(var(--accent-rgb), 0) 75%
+  );
+  border: none;
+  box-shadow: 0 0 24px var(--accent);
   cursor: pointer;
+}
+
+.ship {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: var(--accent);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  box-shadow: 0 0 16px var(--accent);
 }
 
 .start-button {

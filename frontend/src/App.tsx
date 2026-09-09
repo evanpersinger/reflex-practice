@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import ButtonGame from './ButtonGame'
+import DodgeGame from './DodgeGame'
 import Stats from './Stats'
 
-type Screen = 'button' | 'stats'
+type Screen = 'button' | 'dodge' | 'stats'
 type Attempt = { time_ms: number }
 
 function App() {
@@ -36,6 +37,12 @@ function App() {
           >
             Button
           </button>
+          <button
+            className={`nav-button ${screen === 'dodge' ? 'active' : ''}`}
+            onClick={() => setScreen('dodge')}
+          >
+            Dodge
+          </button>
         </div>
         <button
           className={`nav-button ${screen === 'stats' ? 'active' : ''}`}
@@ -45,11 +52,9 @@ function App() {
         </button>
       </nav>
 
-      {screen === 'button' ? (
-        <ButtonGame onResult={recordResult} />
-      ) : (
-        <Stats times={times} />
-      )}
+      {screen === 'button' && <ButtonGame onResult={recordResult} />}
+      {screen === 'dodge' && <DodgeGame />}
+      {screen === 'stats' && <Stats times={times} />}
     </div>
   )
 }
