@@ -71,8 +71,8 @@
 
 .play-area {
   position: relative;
-  width: min(94cqw, 1100px);
-  height: min(60cqh, 650px);
+  width: min(98cqw, 1300px);
+  height: min(75cqh, 800px);
   border: 2px solid var(--accent);
   border-radius: 12px;
   box-shadow:
@@ -111,11 +111,31 @@
 
 .ship {
   position: absolute;
-  width: 40px;
-  height: 40px;
+  color: var(--accent);
+  transform: rotate(-45deg);
+  filter: drop-shadow(0 0 8px var(--accent));
+}
+
+.obstacle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
   background: var(--accent);
-  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-  box-shadow: 0 0 16px var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+
+.game-over {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, monospace;
+  font-size: 48px;
+  color: var(--accent);
+  text-shadow: 0 0 20px var(--accent);
+  background: rgba(0, 0, 0, 0.55);
 }
 
 .start-button {
