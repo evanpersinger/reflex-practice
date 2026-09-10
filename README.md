@@ -1,6 +1,9 @@
 # reflexes-practice
 
-A simple reaction time test game.
+A browser-based reflexes practice game with two modes:
+
+- **Button** — click a randomly placed target as fast as you can, reaction time is timed
+- **Dodge** — pilot a 3D spaceship through incoming asteroids, survive as long as possible
 
 ## Stack
 
