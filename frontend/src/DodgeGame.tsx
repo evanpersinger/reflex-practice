@@ -1,4 +1,5 @@
-import { Diamond, Gem, Octagon, Rocket, Stone } from 'lucide-react'
+import { Stars, useGLTF } from '@react-three/drei'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { useEffect, useRef, useState } from 'react'
 
 const SHIP_SIZE = 64
@@ -9,7 +10,12 @@ const OBSTACLE_SPEED = 340
 const SPAWN_INTERVAL_MS = 700
 const CROSS_SPEED = 500
 const CROSS_INTERVAL_MS = 10000
-const OBSTACLE_SHAPES = [Stone, Gem, Octagon, Diamond]
+
+const WORLD_WIDTH = 16
+const WORLD_DEPTH = 24
+const CAMERA_HEIGHT = 4.5
+const CAMERA_BACK = 4.5
+const LOOK_AHEAD = 8
 
 type Phase = 'idle' | 'playing' | 'lost'
 type Obstacle = {
@@ -20,7 +26,52 @@ type Obstacle = {
   vy: number
   size: number
   rotation: number
-  Shape: (typeof OBSTACLE_SHAPES)[number]
+}
+
+function toWorldX(px: number, containerW: number) {
+  return (px / containerW - 0.5) * WORLD_WIDTH
+}
+
+function toWorldZ(py: number, containerH: number) {
+  return (py / containerH) * WORLD_DEPTH - WORLD_DEPTH
+}
+
+function ChaseCamera({
+  shipX,
+  shipZ,
+}: {
+  shipX: number
+  shipZ: number
+}) {
+  useFrame(({ camera }) => {
+    camera.position.set(shipX, CAMERA_HEIGHT, shipZ + CAMERA_BACK)
+    camera.lookAt(shipX, 0, shipZ - LOOK_AHEAD)
+  })
+  return null
+}
+
+function ShipMesh({ x, z }: { x: number; z: number }) {
+  const { scene } = useGLTF('/models/craft_racer.glb')
+  return (
+    <primitive
+      object={scene}
+      position={[x, 0, z]}
+      rotation={[0, Math.PI, 0]}
+      scale={1.4}
+    />
+  )
+}
+
+useGLTF.preload('/models/craft_racer.glb')
+
+function ObstacleMesh({ x, z, size, rotation }: { x: number; z: number; size: number; rotation: number }) {
+  const scale = size / OBSTACLE_MIN_SIZE
+  return (
+    <mesh position={[x, 0, z]} scale={scale} rotation={[rotation, rotation * 0.6, 0]}>
+      <icosahedronGeometry args={[0.5, 0]} />
+      <meshStandardMaterial color="#ff3c3c" emissive="#ff3c3c" emissiveIntensity={0.35} flatShading />
+    </mesh>
+  )
 }
 
 function DodgeGame() {
@@ -131,8 +182,7 @@ function DodgeGame() {
           vx: 0,
           vy: OBSTACLE_SPEED,
           size,
-          rotation: Math.random() * 360,
-          Shape: OBSTACLE_SHAPES[Math.floor(Math.random() * OBSTACLE_SHAPES.length)],
+          rotation: Math.random() * Math.PI * 2,
         })
       }
 
@@ -149,8 +199,7 @@ function DodgeGame() {
           vx: fromLeft ? CROSS_SPEED : -CROSS_SPEED,
           vy: 0,
           size,
-          rotation: Math.random() * 360,
-          Shape: OBSTACLE_SHAPES[Math.floor(Math.random() * OBSTACLE_SHAPES.length)],
+          rotation: Math.random() * Math.PI * 2,
         })
       }
 
@@ -178,33 +227,36 @@ function DodgeGame() {
     return () => cancelAnimationFrame(frameId)
   }, [phase])
 
+  const containerEl = containerRef.current
+  const containerW = containerEl?.clientWidth || 1
+  const containerH = containerEl?.clientHeight || 1
+  const shipWorldX = toWorldX(position.x + SHIP_SIZE / 2, containerW)
+  const shipWorldZ = toWorldZ(position.y + SHIP_SIZE / 2, containerH)
+
   return (
     <div className="game">
       <div className="play-area" ref={containerRef}>
-        <svg width="0" height="0" style={{ position: 'absolute' }}>
-          <defs>
-            <linearGradient id="ship-gradient" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#ff8800" />
-              <stop offset="50%" stopColor="#ff3ea5" />
-              <stop offset="100%" stopColor="#00e5ff" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <Rocket
-          className="ship"
-          style={{ left: position.x, top: position.y }}
-          size={SHIP_SIZE}
-          strokeWidth={2}
-        />
-        {obstacles.map((o) => (
-          <o.Shape
-            key={o.id}
-            className="obstacle"
-            style={{ left: o.x, top: o.y, transform: `rotate(${o.rotation}deg)` }}
-            size={o.size}
-            strokeWidth={2}
-          />
-        ))}
+        <Canvas shadows camera={{ fov: 60 }}>
+          <color attach="background" args={['#05070a']} />
+          <ChaseCamera shipX={shipWorldX} shipZ={shipWorldZ} />
+          <ambientLight intensity={1.5} />
+          <hemisphereLight args={['#8899ff', '#1a1420', 1.5]} />
+          <directionalLight position={[3, 6, 4]} intensity={2.5} color="#ffffff" />
+          <pointLight position={[0, 4, 4]} intensity={80} color="#ff8800" />
+          <fog attach="fog" args={['#05070a', 10, WORLD_DEPTH]} />
+          <Stars radius={60} depth={40} count={3000} factor={3} fade speed={1} />
+          <ShipMesh x={shipWorldX} z={shipWorldZ} />
+          {obstacles.map((o) => (
+            <ObstacleMesh
+              key={o.id}
+              x={toWorldX(o.x + o.size / 2, containerW)}
+              z={toWorldZ(o.y + o.size / 2, containerH)}
+              size={o.size}
+              rotation={o.rotation}
+            />
+          ))}
+        </Canvas>
+
         {phase === 'lost' && survivedSeconds !== null && (
           <div className="game-over">
             <div className="game-over-card">
